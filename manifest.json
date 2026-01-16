@@ -1,0 +1,21 @@
+{
+    "name": "AWCH IT Work Tracker",
+    "short_name": "AWCH Tracker",
+    "description": "Task management system for AWCH IT department",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#3b82f6",
+    "theme_color": "#3b82f6",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
