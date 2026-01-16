@@ -736,8 +736,92 @@
         </form>
     </div>
 
-    <!-- Other Modals (same structure but with dark mode classes) -->
-    <!-- ... (User Modal, Change Password Modal, Handover Modal, History Modal, Done Modal) ... -->
+    <!-- Other Modals -->
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <form id="changePasswordForm" class="bg-white dark:bg-gray-800 w-full max-w-md p-6 rounded-lg space-y-4 border dark:border-gray-700" onsubmit="changePassword(event)">
+            <h3 class="font-semibold text-lg dark:text-white">Change Password</h3>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                <input type="password" id="currentPassword" required 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                <input type="password" id="newPassword" required 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
+                <input type="password" id="confirmPassword" required 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeChangePassword()" 
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition dark:text-white">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Change Password
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <form id="addUserForm" class="bg-white dark:bg-gray-800 w-full max-w-md p-6 rounded-lg space-y-4 border dark:border-gray-700" onsubmit="saveUser(event)">
+            <h3 class="font-semibold text-lg dark:text-white">Add New User</h3>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username *</label>
+                <input type="text" id="newUsername" required 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                <input type="text" id="newFullName" 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                <input type="email" id="newEmail" 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password *</label>
+                <input type="password" id="newUserPassword" required 
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role *</label>
+                <select id="newUserRole" required 
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeAddUser()" 
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition dark:text-white">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Save User
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Task History Modal -->
+    <div id="historyModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 rounded-lg space-y-4 max-h-[90vh] overflow-y-auto border dark:border-gray-700">
+            <h3 class="font-semibold text-lg dark:text-white">Task History</h3>
+            <div id="historyContent" class="space-y-3">
+                <!-- History will be populated here -->
+            </div>
+            <div class="pt-4 border-t dark:border-gray-700">
+                <button onclick="closeHistory()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Supabase Configuration
@@ -769,7 +853,7 @@
         let charts = {};
         let deferredPrompt = null;
         
-        // Database tables structure for new features:
+        // Database tables structure
         /*
         // Tasks table should have these additional columns:
         - priority: text (Urgent, High, Medium, Low)
@@ -786,6 +870,37 @@
             tasks: { data: null, timestamp: null, ttl: 30 * 1000 },
             deletedTasks: { data: null, timestamp: null, ttl: 60 * 1000 }
         };
+        
+        // Cache Helper Functions
+        function getFromCache(key) {
+            const item = cache[key];
+            if (!item || !item.data) return null;
+            
+            const now = Date.now();
+            if (now - item.timestamp > item.ttl) {
+                cache[key] = { data: null, timestamp: null };
+                return null;
+            }
+            
+            return item.data;
+        }
+
+        function setToCache(key, data) {
+            cache[key] = {
+                data: data,
+                timestamp: Date.now()
+            };
+        }
+
+        function clearCache(key = null) {
+            if (key) {
+                cache[key] = { data: null, timestamp: null };
+            } else {
+                Object.keys(cache).forEach(k => {
+                    cache[k] = { data: null, timestamp: null };
+                });
+            }
+        }
         
         // Initialize PWA
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -878,7 +993,9 @@
                 if (searchTerm) {
                     const searchMatch = task.title.toLowerCase().includes(searchTerm) ||
                                       task.task_id.toLowerCase().includes(searchTerm) ||
-                                      (task.note && task.note.toLowerCase().includes(searchTerm));
+                                      (task.note && task.note.toLowerCase().includes(searchTerm)) ||
+                                      (task.by && task.by.toLowerCase().includes(searchTerm)) ||
+                                      (task.to && task.to.toLowerCase().includes(searchTerm));
                     if (!searchMatch) return false;
                 }
                 
@@ -937,6 +1054,8 @@
                 tasks[taskIndex].status = 'In Progress';
             }
             
+            tasks[taskIndex].history.push(`${new Date().toLocaleString()}: Progress updated to ${progress}% by ${currentUser}`);
+            
             // Save to database
             saveTaskProgress(taskId, progress);
             render();
@@ -944,18 +1063,482 @@
         
         async function saveTaskProgress(taskId, progress) {
             try {
+                const task = tasks.find(t => t.id === taskId);
                 await supabaseClient
                     .from('tasks')
                     .update({ 
                         progress: progress,
                         status: progress >= 100 ? 'Done' : (progress > 0 ? 'In Progress' : 'Pending'),
-                        updated_at: new Date().toISOString()
+                        done_at: progress >= 100 ? new Date().toISOString() : null,
+                        done_by: progress >= 100 ? currentUser : null,
+                        updated_at: new Date().toISOString(),
+                        history: task.history
                     })
                     .eq('id', taskId);
                 
                 clearCache('tasks');
             } catch (error) {
                 console.error('Error saving progress:', error);
+            }
+        }
+        
+        // Login Functions
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            const loginBtn = document.getElementById('loginBtnText');
+            const loading = document.getElementById('loginLoading');
+            
+            loginBtn.textContent = 'Authenticating...';
+            loading.classList.remove('hidden');
+            
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Database connection failed');
+                }
+                
+                // Simple auth (replace with proper auth later)
+                const { data: users, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('username', username);
+                
+                if (error) throw error;
+                
+                if (users.length === 0) {
+                    throw new Error('User not found');
+                }
+                
+                const user = users[0];
+                
+                // Simple password check (replace with proper hashing)
+                if (password !== user.password) {
+                    throw new Error('Invalid password');
+                }
+                
+                // Set current user
+                currentUser = user.username;
+                currentUserId = user.id;
+                currentUserFullName = user.full_name || user.username;
+                currentUserRole = user.role || 'user';
+                
+                // Update last login
+                await supabaseClient
+                    .from('users')
+                    .update({ last_login: new Date().toISOString() })
+                    .eq('id', user.id);
+                
+                // Save to localStorage if remember me is checked
+                if (rememberMe) {
+                    localStorage.setItem('awch_user', JSON.stringify({
+                        username: user.username,
+                        role: user.role,
+                        full_name: user.full_name
+                    }));
+                } else {
+                    sessionStorage.setItem('awch_user', JSON.stringify({
+                        username: user.username,
+                        role: user.role,
+                        full_name: user.full_name
+                    }));
+                }
+                
+                // Update UI
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                
+                await initializeApp();
+                
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+                console.error('Login error:', error);
+            } finally {
+                loginBtn.textContent = 'Login to Dashboard';
+                loading.classList.add('hidden');
+            }
+        }
+        
+        async function checkAutoLogin(userData) {
+            try {
+                const { data: users, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('username', userData.username);
+                
+                if (error || users.length === 0) return false;
+                
+                currentUser = userData.username;
+                currentUserRole = userData.role;
+                currentUserFullName = userData.full_name;
+                
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function stringToColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const hue = hash % 360;
+            return `hsl(${hue}, 70%, 60%)`;
+        }
+        
+        function updateUserInfo() {
+            // Sidebar
+            document.getElementById('sidebarUserName').textContent = currentUserFullName;
+            document.getElementById('sidebarUserRole').textContent = currentUserRole;
+            
+            // Dropdown
+            document.getElementById('dropdownUserName').textContent = currentUserFullName;
+            document.getElementById('dropdownUserRole').textContent = currentUserRole;
+            
+            // Header
+            document.getElementById('headerUserName').textContent = currentUserFullName;
+            document.getElementById('headerUserRole').textContent = currentUserRole;
+            
+            // Profile images
+            const initials = currentUserFullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            const profileElements = document.querySelectorAll('.profile-img');
+            profileElements.forEach(el => {
+                el.innerHTML = `<span class="text-sm">${initials}</span>`;
+                el.style.backgroundColor = stringToColor(currentUserFullName);
+            });
+        }
+        
+        function logout() {
+            localStorage.removeItem('awch_user');
+            sessionStorage.removeItem('awch_user');
+            location.reload();
+        }
+        
+        // Task Management Functions
+        async function generateTaskId() {
+            const date = new Date();
+            const year = date.getFullYear().toString().slice(-2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            
+            // Get last task number for today
+            const todayTasks = tasks.filter(t => {
+                const taskDate = new Date(t.assignedAt);
+                return taskDate.getDate() === date.getDate() && 
+                       taskDate.getMonth() === date.getMonth() && 
+                       taskDate.getFullYear() === date.getFullYear();
+            });
+            
+            const taskNumber = (todayTasks.length + 1).toString().padStart(3, '0');
+            return `TASK-${year}${month}${day}-${taskNumber}`;
+        }
+        
+        function openAdd() {
+            document.getElementById('modalTitle').textContent = 'Add New Task';
+            document.getElementById('editId').value = '';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskPriority').value = 'Medium';
+            document.getElementById('assignedBy').value = currentUser;
+            document.getElementById('assignedTo').value = '';
+            document.getElementById('dueDate').value = '';
+            document.getElementById('progress').value = 0;
+            document.getElementById('progressValue').textContent = '0%';
+            document.getElementById('notes').value = '';
+            document.getElementById('recurringOptions').classList.add('hidden');
+            
+            document.getElementById('taskModal').classList.replace('hidden', 'flex');
+        }
+        
+        function openEdit(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Task';
+            document.getElementById('editId').value = taskId;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskPriority').value = task.priority;
+            document.getElementById('assignedBy').value = task.by;
+            document.getElementById('assignedTo').value = task.to;
+            document.getElementById('dueDate').value = task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '';
+            document.getElementById('progress').value = task.progress;
+            document.getElementById('progressValue').textContent = task.progress + '%';
+            document.getElementById('notes').value = task.note || '';
+            
+            document.getElementById('taskModal').classList.replace('hidden', 'flex');
+        }
+        
+        async function saveTask(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtnText');
+            const loading = document.getElementById('saveLoading');
+            
+            saveBtn.textContent = 'Saving...';
+            loading.classList.remove('hidden');
+            
+            try {
+                const taskId = document.getElementById('editId').value;
+                const isEdit = !!taskId;
+                
+                let task;
+                
+                if (isEdit) {
+                    task = tasks.find(t => t.id === taskId);
+                    if (!task) throw new Error('Task not found');
+                    
+                    // Update existing task
+                    task.title = document.getElementById('taskTitle').value;
+                    task.priority = document.getElementById('taskPriority').value;
+                    task.by = document.getElementById('assignedBy').value;
+                    task.to = document.getElementById('assignedTo').value;
+                    task.due_date = document.getElementById('dueDate').value;
+                    task.progress = parseInt(document.getElementById('progress').value);
+                    task.note = document.getElementById('notes').value;
+                    task.history.push(`${new Date().toLocaleString()}: Updated by ${currentUser}`);
+                    
+                    // Update status based on progress
+                    if (task.progress >= 100) {
+                        task.status = 'Done';
+                        task.doneAt = new Date().toLocaleString();
+                        task.doneBy = currentUser;
+                    } else if (task.progress > 0 && task.progress < 100) {
+                        task.status = 'In Progress';
+                    }
+                    
+                } else {
+                    // Create new task
+                    task = {
+                        id: '',
+                        task_id: await generateTaskId(),
+                        title: document.getElementById('taskTitle').value,
+                        by: document.getElementById('assignedBy').value || currentUser,
+                        to: document.getElementById('assignedTo').value,
+                        note: document.getElementById('notes').value,
+                        assignedAt: new Date().toISOString(),
+                        due_date: document.getElementById('dueDate').value,
+                        priority: document.getElementById('taskPriority').value,
+                        progress: parseInt(document.getElementById('progress').value),
+                        status: 'Pending',
+                        history: [`${new Date().toLocaleString()}: Created by ${currentUser}`]
+                    };
+                    
+                    // Check for recurring options
+                    const frequency = document.getElementById('recurringFrequency').value;
+                    if (frequency) {
+                        task.recurring_frequency = frequency;
+                        task.recurring_end_date = document.getElementById('recurringEndDate').value;
+                        task.parent_task_id = null;
+                    }
+                }
+                
+                const success = await saveTaskToSupabase(task, isEdit);
+                
+                if (success) {
+                    closeModal();
+                    await loadTasks(true);
+                    render();
+                    
+                    // Generate recurring tasks if needed
+                    if (!isEdit && task.recurring_frequency) {
+                        await generateRecurringTasks(task);
+                    }
+                }
+                
+            } catch (error) {
+                alert('Error saving task: ' + error.message);
+                console.error('Save task error:', error);
+            } finally {
+                saveBtn.textContent = 'Save Task';
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('taskModal').classList.replace('flex', 'hidden');
+            document.getElementById('quickAddModal').classList.replace('flex', 'hidden');
+            document.getElementById('changePasswordModal').classList.replace('flex', 'hidden');
+            document.getElementById('addUserModal').classList.replace('flex', 'hidden');
+            document.getElementById('historyModal').classList.replace('flex', 'hidden');
+        }
+        
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+            
+            try {
+                const task = tasks.find(t => t.id === taskId);
+                if (!task) return;
+                
+                // Soft delete
+                const { error } = await supabaseClient
+                    .from('tasks')
+                    .update({ 
+                        deleted_at: new Date().toISOString(),
+                        deleted_by: currentUser
+                    })
+                    .eq('id', taskId);
+                
+                if (error) throw error;
+                
+                clearCache('tasks');
+                await loadTasks(true);
+                render();
+                
+            } catch (error) {
+                alert('Error deleting task: ' + error.message);
+                console.error('Delete task error:', error);
+            }
+        }
+        
+        // Enhanced Task Loading with new fields
+        async function loadTasks(forceRefresh = false) {
+            try {
+                document.getElementById('refreshStatus').textContent = 'Loading...';
+                
+                if (!forceRefresh && getFromCache('tasks')) {
+                    tasks = getFromCache('tasks');
+                    document.getElementById('refreshStatus').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                    return;
+                }
+                
+                if (!supabaseClient) throw new Error('Supabase client not initialized');
+                
+                const { data, error } = await supabaseClient
+                    .from('tasks')
+                    .select('*')
+                    .is('deleted_at', null)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                tasks = data.map(task => ({
+                    id: task.id,
+                    task_id: task.task_id,
+                    title: task.title,
+                    by: task.assigned_by,
+                    to: task.assigned_to,
+                    note: task.notes,
+                    assignedAt: new Date(task.assigned_at).toLocaleString(),
+                    due_date: task.due_date,
+                    priority: task.priority || 'Medium',
+                    progress: task.progress || 0,
+                    status: task.status || 'Pending',
+                    doneAt: task.done_at ? new Date(task.done_at).toLocaleString() : '',
+                    doneBy: task.done_by || '',
+                    doneNote: task.done_note || '',
+                    history: task.history || [],
+                    recurring_frequency: task.recurring_frequency,
+                    recurring_end_date: task.recurring_end_date,
+                    parent_task_id: task.parent_task_id
+                }));
+                
+                setToCache('tasks', tasks);
+                document.getElementById('refreshStatus').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                
+                // Check for overdue tasks
+                checkOverdueTasks();
+                
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                document.getElementById('refreshStatus').textContent = 'Error loading tasks';
+            }
+        }
+        
+        function checkOverdueTasks() {
+            const today = new Date();
+            tasks.forEach(task => {
+                if (task.due_date && task.status !== 'Done') {
+                    const dueDate = new Date(task.due_date);
+                    if (dueDate < today) {
+                        // You can add notification logic here
+                        console.log(`Task ${task.task_id} is overdue!`);
+                    }
+                }
+            });
+        }
+        
+        // Enhanced Task Saving with new fields
+        async function saveTaskToSupabase(task, isUpdate = false) {
+            try {
+                const taskData = {
+                    task_id: task.task_id,
+                    title: task.title,
+                    assigned_by: task.by,
+                    assigned_to: task.to,
+                    notes: task.note,
+                    assigned_at: task.assignedAt,
+                    due_date: task.due_date ? new Date(task.due_date).toISOString() : null,
+                    priority: task.priority,
+                    progress: task.progress,
+                    status: task.status,
+                    done_at: task.doneAt ? new Date(task.doneAt).toISOString() : null,
+                    done_by: task.doneBy || null,
+                    done_note: task.doneNote || null,
+                    history: task.history,
+                    recurring_frequency: task.recurring_frequency || null,
+                    recurring_end_date: task.recurring_end_date ? new Date(task.recurring_end_date).toISOString() : null,
+                    parent_task_id: task.parent_task_id || null
+                };
+                
+                let result;
+                if (isUpdate) {
+                    result = await supabaseClient
+                        .from('tasks')
+                        .update(taskData)
+                        .eq('id', task.id);
+                } else {
+                    result = await supabaseClient
+                        .from('tasks')
+                        .insert([taskData]);
+                }
+                
+                const { error } = result;
+                if (error) throw error;
+                
+                clearCache('tasks');
+                return true;
+            } catch (error) {
+                console.error('Error saving task:', error);
+                alert('Error saving task to database');
+                return false;
+            }
+        }
+        
+        // Quick Add Task
+        function openQuickAdd() {
+            document.getElementById('quickTaskTitle').value = '';
+            document.getElementById('quickAddModal').classList.replace('hidden', 'flex');
+        }
+        
+        async function quickSaveTask(e) {
+            e.preventDefault();
+            const title = document.getElementById('quickTaskTitle').value;
+            const priority = document.getElementById('quickPriority').value;
+            
+            if (!title.trim()) return;
+            
+            const task = {
+                id: '',
+                task_id: await generateTaskId(),
+                title: title,
+                by: currentUser,
+                to: currentUser,
+                note: '',
+                assignedAt: new Date().toISOString(),
+                priority: priority,
+                progress: 0,
+                status: 'Pending',
+                history: [`${new Date().toLocaleString()}: Created by ${currentUser} via Quick Add`]
+            };
+            
+            const success = await saveTaskToSupabase(task, false);
+            if (success) {
+                document.getElementById('quickAddModal').classList.replace('flex', 'hidden');
+                await loadTasks(true);
+                render();
             }
         }
         
@@ -995,7 +1578,7 @@
                         ...parentTask,
                         id: '',
                         task_id: await generateTaskId(),
-                        assignedAt: nextDate.toLocaleString(),
+                        assignedAt: nextDate.toISOString(),
                         status: 'Pending',
                         progress: 0,
                         parent_task_id: parentTask.id,
@@ -1012,6 +1595,415 @@
             for (const task of recurringTasks) {
                 await saveTaskToSupabase(task, false);
             }
+        }
+        
+        // User Management
+        async function loadUsers(forceRefresh = false) {
+            try {
+                if (!forceRefresh && getFromCache('users')) {
+                    users = getFromCache('users');
+                    return;
+                }
+                
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                users = data;
+                setToCache('users', users);
+                
+                // Populate user dropdowns
+                const assignedBy = document.getElementById('assignedBy');
+                const assignedTo = document.getElementById('assignedTo');
+                
+                assignedBy.innerHTML = '<option value="">Select or type...</option>';
+                assignedTo.innerHTML = '<option value="">Select team member</option>';
+                
+                users.forEach(user => {
+                    const option1 = document.createElement('option');
+                    option1.value = user.username;
+                    option1.textContent = `${user.full_name || user.username} (${user.role})`;
+                    assignedBy.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = user.username;
+                    option2.textContent = `${user.full_name || user.username} (${user.role})`;
+                    assignedTo.appendChild(option2);
+                });
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        // Page Navigation
+        function setPage(pageName) {
+            document.getElementById('pageTitle').textContent = pageName;
+            
+            // Update active menu button
+            document.querySelectorAll('.menuBtn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            });
+            
+            // Hide all views
+            document.getElementById('tableView').classList.add('hidden');
+            document.getElementById('mobileTasks').classList.add('hidden');
+            document.getElementById('kanbanView').classList.add('hidden');
+            document.getElementById('analyticsView').classList.add('hidden');
+            document.getElementById('usersTableContainer').classList.add('hidden');
+            document.getElementById('deletedTasksContainer').classList.add('hidden');
+            document.getElementById('reportsView').classList.add('hidden');
+            
+            // Show appropriate view
+            switch(pageName) {
+                case 'Dashboard':
+                    render();
+                    break;
+                case 'My Tasks':
+                    render();
+                    break;
+                case 'Done by Me':
+                    render();
+                    break;
+                case 'Kanban Board':
+                    document.getElementById('kanbanView').classList.remove('hidden');
+                    render();
+                    break;
+                case 'Analytics':
+                    document.getElementById('analyticsView').classList.remove('hidden');
+                    render();
+                    break;
+                case 'Manage Users':
+                    document.getElementById('usersTableContainer').classList.remove('hidden');
+                    loadManageUsers();
+                    break;
+                case 'Deleted Tasks':
+                    document.getElementById('deletedTasksContainer').classList.remove('hidden');
+                    loadDeletedTasks();
+                    break;
+                case 'Reports':
+                    document.getElementById('reportsView').classList.remove('hidden');
+                    break;
+            }
+            
+            // Close mobile menu if open
+            if (window.innerWidth < 768) {
+                toggleMenu();
+            }
+        }
+        
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        // Enhanced Render Function
+        async function render() {
+            await loadTasks();
+            
+            const pageTitle = document.getElementById('pageTitle').textContent;
+            let filtered = filterTasks(tasks);
+            
+            // Page-specific filtering
+            if (pageTitle === 'My Tasks') {
+                filtered = filtered.filter(t => t.to === currentUser && t.status !== 'Done');
+            } else if (pageTitle === 'Done by Me') {
+                filtered = filtered.filter(t => t.status === 'Done' && t.doneBy === currentUser);
+            }
+            
+            // Sort by priority and date
+            filtered.sort((a, b) => {
+                const priorityOrder = { 'Urgent': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
+                const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2);
+                if (priorityDiff !== 0) return priorityDiff;
+                return new Date(b.assignedAt) - new Date(a.assignedAt);
+            });
+            
+            // Update UI based on current view
+            updatePendingSummary();
+            updateDashboardStats();
+            
+            if (pageTitle === 'Kanban Board') {
+                document.getElementById('tableView').classList.add('hidden');
+                document.getElementById('mobileTasks').classList.add('hidden');
+                document.getElementById('kanbanView').classList.remove('hidden');
+                renderKanbanBoard();
+            } else if (pageTitle === 'Analytics') {
+                document.getElementById('tableView').classList.add('hidden');
+                document.getElementById('mobileTasks').classList.add('hidden');
+                document.getElementById('kanbanView').classList.add('hidden');
+                document.getElementById('analyticsView').classList.remove('hidden');
+                setTimeout(() => generateAnalytics(), 100); // Wait for DOM
+            } else if (pageTitle === 'Reports') {
+                document.getElementById('tableView').classList.add('hidden');
+                document.getElementById('mobileTasks').classList.add('hidden');
+                document.getElementById('analyticsView').classList.add('hidden');
+                document.getElementById('reportsView').classList.remove('hidden');
+            } else if (pageTitle === 'Manage Users' || pageTitle === 'Deleted Tasks') {
+                // Already handled by setPage
+            } else {
+                document.getElementById('tableView').classList.remove('hidden');
+                document.getElementById('kanbanView').classList.add('hidden');
+                document.getElementById('analyticsView').classList.add('hidden');
+                document.getElementById('reportsView').classList.add('hidden');
+                renderTable(filtered);
+                renderMobileCards(filtered);
+            }
+            
+            // Highlight search results
+            if (searchTerm) {
+                highlightSearchResults();
+            }
+        }
+        
+        function highlightSearchResults() {
+            document.querySelectorAll('#taskTable td, #mobileTasks .kanban-task').forEach(element => {
+                const html = element.innerHTML;
+                const highlighted = html.replace(
+                    new RegExp(searchTerm, 'gi'),
+                    match => `<span class="search-highlight">${match}</span>`
+                );
+                if (highlighted !== html) {
+                    element.innerHTML = highlighted;
+                }
+            });
+        }
+        
+        // Enhanced Table Render
+        function renderTable(filteredTasks) {
+            const taskTable = document.getElementById('taskTable');
+            
+            if (filteredTasks.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            taskTable.innerHTML = filteredTasks.map(task => {
+                const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'Done';
+                
+                return `
+                <tr class="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition ${task.status === 'Pending' ? '' : 'bg-gray-50/50 dark:bg-gray-800/50'}">
+                    <td class="p-3 font-mono text-xs font-bold whitespace-nowrap dark:text-white">${task.task_id}</td>
+                    <td class="p-3 font-medium task-cell dark:text-white" style="min-width: 200px;">
+                        ${task.title}
+                        ${isOverdue ? '<span class="ml-2 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-0.5 rounded">Overdue</span>' : ''}
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-xs ${getPriorityColor(task.priority)} whitespace-nowrap">
+                            <i class="${getPriorityIcon(task.priority)} mr-1"></i>
+                            ${task.priority}
+                        </span>
+                    </td>
+                    <td class="p-3 task-cell dark:text-white">${task.by || '--'}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-xs ${task.to === currentUser ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'} whitespace-nowrap">
+                            ${task.to}
+                        </span>
+                    </td>
+                    <td class="p-3 text-xs ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : 'text-gray-500 dark:text-gray-400'} whitespace-nowrap">
+                        ${task.due_date ? new Date(task.due_date).toLocaleDateString() : '--'}
+                    </td>
+                    <td class="p-3">
+                        <div class="space-y-1">
+                            <div class="progress-bar">
+                                <div class="progress-fill ${task.progress < 50 ? 'bg-red-500' : task.progress < 100 ? 'bg-yellow-500' : 'bg-green-500'}" 
+                                     style="width: ${task.progress}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 text-center">${task.progress}%</div>
+                        </div>
+                    </td>
+                    <td class="p-3">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                   ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
+                                     task.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 
+                                     'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'} 
+                                   whitespace-nowrap">
+                            <span class="w-1.5 h-1.5 ${task.status === 'Done' ? 'bg-green-600' : 
+                                                     task.status === 'In Progress' ? 'bg-blue-600' : 
+                                                     'bg-yellow-600'} rounded-full mr-1.5"></span>
+                            ${task.status}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <div class="flex gap-1 flex-wrap">
+                            <button onclick="updateProgress('${task.id}', ${Math.min(task.progress + 25, 100)})" 
+                                    class="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition" title="Add Progress">
+                                <i class="fas fa-plus text-green-600 dark:text-green-400"></i>
+                            </button>
+                            <button onclick="openEdit('${task.id}')" 
+                                    class="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition" title="Edit">
+                                <i class="fas fa-edit text-blue-600 dark:text-blue-400"></i>
+                            </button>
+                            <button onclick="viewHistory('${task.id}')" 
+                                    class="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition" title="History">
+                                <i class="fas fa-history text-yellow-600 dark:text-yellow-400"></i>
+                            </button>
+                            <button onclick="deleteTask('${task.id}')" 
+                                    class="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete">
+                                <i class="fas fa-trash text-red-600 dark:text-red-400"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        
+        // Helper Functions
+        function updatePendingSummary() {
+            const pendingTasks = tasks.filter(t => t.status !== 'Done');
+            const urgentTasks = pendingTasks.filter(t => t.priority === 'Urgent');
+            
+            document.getElementById('pendingCount').textContent = pendingTasks.length;
+            document.getElementById('urgentCount').textContent = urgentTasks.length;
+            
+            const pendingList = document.getElementById('pendingTasksList');
+            if (pendingTasks.length === 0) {
+                pendingList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No pending tasks</p>';
+                return;
+            }
+            
+            pendingList.innerHTML = pendingTasks.slice(0, 5).map(task => `
+                <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium truncate dark:text-white">${task.title}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <span class="${getPriorityColor(task.priority)} px-2 py-0.5 rounded-full text-xs">${task.priority}</span>
+                            ${task.due_date ? '· Due: ' + new Date(task.due_date).toLocaleDateString() : ''}
+                        </p>
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button onclick="updateProgress('${task.id}', ${Math.min(task.progress + 25, 100)})" 
+                                class="text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 p-1 rounded">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button onclick="openEdit('${task.id}')" 
+                                class="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-1 rounded">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderMobileCards(filteredTasks) {
+            const mobileContainer = document.getElementById('mobileTasks');
+            
+            if (filteredTasks.length === 0) {
+                mobileContainer.innerHTML = `
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow border dark:border-gray-700 text-center">
+                        <i class="fas fa-inbox text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No tasks found</p>
+                        <button onclick="openAdd()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>Add Your First Task
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            mobileContainer.innerHTML = filteredTasks.map(task => `
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border dark:border-gray-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-mono text-xs font-bold dark:text-white">${task.task_id}</span>
+                            <h3 class="font-medium dark:text-white break-words">${task.title}</h3>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded ${getPriorityColor(task.priority)}">
+                            <i class="${getPriorityIcon(task.priority)} mr-1"></i>
+                            ${task.priority}
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-400">From:</span>
+                            <span class="ml-1 dark:text-white">${task.by || '--'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-400">To:</span>
+                            <span class="ml-1 dark:text-white">${task.to}</span>
+                        </div>
+                    </div>
+                    
+                    ${task.due_date ? `
+                    <div class="mb-3">
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">Due Date:</span>
+                        <span class="ml-1 ${new Date(task.due_date) < new Date() ? 'text-red-600 dark:text-red-400 font-bold' : 'dark:text-white'}">
+                            ${new Date(task.due_date).toLocaleDateString()}
+                        </span>
+                    </div>` : ''}
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-500 dark:text-gray-400">Progress</span>
+                            <span class="dark:text-white">${task.progress}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${task.progress < 50 ? 'bg-red-500' : task.progress < 100 ? 'bg-yellow-500' : 'bg-green-500'}" 
+                                 style="width: ${task.progress}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                   ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
+                                     task.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 
+                                     'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'}">
+                            <span class="w-1.5 h-1.5 ${task.status === 'Done' ? 'bg-green-600' : 
+                                                     task.status === 'In Progress' ? 'bg-blue-600' : 
+                                                     'bg-yellow-600'} rounded-full mr-1.5"></span>
+                            ${task.status}
+                        </span>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="updateProgress('${task.id}', ${Math.min(task.progress + 25, 100)})" 
+                                    class="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition">
+                                <i class="fas fa-plus text-green-600 dark:text-green-400"></i>
+                            </button>
+                            <button onclick="openEdit('${task.id}')" 
+                                    class="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition">
+                                <i class="fas fa-edit text-blue-600 dark:text-blue-400"></i>
+                            </button>
+                            <button onclick="deleteTask('${task.id}')" 
+                                    class="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition">
+                                <i class="fas fa-trash text-red-600 dark:text-red-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showEmptyState() {
+            const taskTable = document.getElementById('taskTable');
+            taskTable.innerHTML = `
+                <tr>
+                    <td colspan="9" class="p-8 text-center">
+                        <i class="fas fa-inbox text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No tasks found</p>
+                        <button onclick="openAdd()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>Add Your First Task
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function toggleUserProfile() {
+            const dropdown = document.getElementById('userProfileDropdown');
+            dropdown.classList.toggle('hidden');
         }
         
         // Analytics and Reports
@@ -1327,309 +2319,178 @@
             URL.revokeObjectURL(url);
         }
         
-        // Enhanced Task Loading with new fields
-        async function loadTasks(forceRefresh = false) {
-            try {
-                document.getElementById('refreshStatus').textContent = 'Loading...';
-                
-                if (!forceRefresh && getFromCache('tasks')) {
-                    tasks = getFromCache('tasks');
-                    document.getElementById('refreshStatus').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-                    return;
-                }
-                
-                if (!supabaseClient) throw new Error('Supabase client not initialized');
-                
-                const { data, error } = await supabaseClient
-                    .from('tasks')
-                    .select('*')
-                    .is('deleted_at', null)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                tasks = data.map(task => ({
-                    id: task.id,
-                    task_id: task.task_id,
-                    title: task.title,
-                    by: task.assigned_by,
-                    to: task.assigned_to,
-                    note: task.notes,
-                    assignedAt: new Date(task.assigned_at).toLocaleString(),
-                    due_date: task.due_date,
-                    priority: task.priority || 'Medium',
-                    progress: task.progress || 0,
-                    status: task.status || 'Pending',
-                    doneAt: task.done_at ? new Date(task.done_at).toLocaleString() : '',
-                    doneBy: task.done_by || '',
-                    doneNote: task.done_note || '',
-                    history: task.history || [],
-                    recurring_frequency: task.recurring_frequency,
-                    recurring_end_date: task.recurring_end_date,
-                    parent_task_id: task.parent_task_id
-                }));
-                
-                setToCache('tasks', tasks);
-                document.getElementById('refreshStatus').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-                
-                // Check for overdue tasks
-                checkOverdueTasks();
-                
-            } catch (error) {
-                console.error('Error loading tasks:', error);
-                document.getElementById('refreshStatus').textContent = 'Error loading tasks';
-            }
+        // Modal Functions
+        function openChangePassword() {
+            document.getElementById('changePasswordModal').classList.replace('hidden', 'flex');
         }
         
-        function checkOverdueTasks() {
-            const today = new Date();
-            tasks.forEach(task => {
-                if (task.due_date && task.status !== 'Done') {
-                    const dueDate = new Date(task.due_date);
-                    if (dueDate < today) {
-                        // You can add notification logic here
-                        console.log(`Task ${task.task_id} is overdue!`);
-                    }
-                }
-            });
+        function closeChangePassword() {
+            document.getElementById('changePasswordModal').classList.replace('flex', 'hidden');
         }
         
-        // Enhanced Task Saving with new fields
-        async function saveTaskToSupabase(task, isUpdate = false) {
-            try {
-                const taskData = {
-                    task_id: task.task_id,
-                    title: task.title,
-                    assigned_by: task.by,
-                    assigned_to: task.to,
-                    notes: task.note,
-                    assigned_at: new Date(task.assignedAt).toISOString(),
-                    due_date: task.due_date ? new Date(task.due_date).toISOString() : null,
-                    priority: task.priority,
-                    progress: task.progress,
-                    status: task.status,
-                    done_at: task.doneAt ? new Date(task.doneAt).toISOString() : null,
-                    done_by: task.doneBy || null,
-                    done_note: task.doneNote || null,
-                    history: task.history,
-                    recurring_frequency: task.recurring_frequency || null,
-                    recurring_end_date: task.recurring_end_date ? new Date(task.recurring_end_date).toISOString() : null,
-                    parent_task_id: task.parent_task_id || null
-                };
-                
-                let result;
-                if (isUpdate) {
-                    result = await supabaseClient
-                        .from('tasks')
-                        .update(taskData)
-                        .eq('id', task.id);
-                } else {
-                    result = await supabaseClient
-                        .from('tasks')
-                        .insert([taskData]);
-                }
-                
-                const { error } = result;
-                if (error) throw error;
-                
-                clearCache('tasks');
-                return true;
-            } catch (error) {
-                console.error('Error saving task:', error);
-                alert('Error saving task to database');
-                return false;
-            }
+        function openAddUser() {
+            document.getElementById('addUserModal').classList.replace('hidden', 'flex');
         }
         
-        // Quick Add Task
-        function openQuickAdd() {
-            document.getElementById('quickTaskTitle').value = '';
-            document.getElementById('quickAddModal').classList.replace('hidden', 'flex');
+        function closeAddUser() {
+            document.getElementById('addUserModal').classList.replace('flex', 'hidden');
         }
         
-        async function quickSaveTask(e) {
-            e.preventDefault();
-            const title = document.getElementById('quickTaskTitle').value;
-            const priority = document.getElementById('quickPriority').value;
+        async function viewHistory(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
             
-            if (!title.trim()) return;
-            
-            const task = {
-                id: '',
-                task_id: await generateTaskId(),
-                title: title,
-                by: currentUser,
-                to: currentUser,
-                note: '',
-                assignedAt: new Date().toLocaleString(),
-                priority: priority,
-                progress: 0,
-                status: 'Pending',
-                history: [`${new Date().toLocaleString()}: Created by ${currentUser} via Quick Add`]
-            };
-            
-            const success = await saveTaskToSupabase(task, false);
-            if (success) {
-                document.getElementById('quickAddModal').classList.replace('flex', 'hidden');
-                await loadTasks(true);
-                render();
-            }
-        }
-        
-        // Enhanced Render Function
-        async function render() {
-            await loadTasks();
-            
-            const pageTitle = document.getElementById('pageTitle').textContent;
-            let filtered = filterTasks(tasks);
-            
-            // Page-specific filtering
-            if (pageTitle === 'My Tasks') {
-                filtered = filtered.filter(t => t.to === currentUser && t.status !== 'Done');
-            } else if (pageTitle === 'Done by Me') {
-                filtered = filtered.filter(t => t.status === 'Done' && t.doneBy === currentUser);
-            }
-            
-            // Sort by priority and date
-            filtered.sort((a, b) => {
-                const priorityOrder = { 'Urgent': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
-                const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2);
-                if (priorityDiff !== 0) return priorityDiff;
-                return new Date(b.assignedAt) - new Date(a.assignedAt);
-            });
-            
-            // Update UI based on current view
-            updatePendingSummary();
-            updateDashboardStats();
-            
-            if (pageTitle === 'Kanban Board') {
-                document.getElementById('tableView').classList.add('hidden');
-                document.getElementById('mobileTasks').classList.add('hidden');
-                document.getElementById('kanbanView').classList.remove('hidden');
-                renderKanbanBoard();
-            } else if (pageTitle === 'Analytics') {
-                document.getElementById('tableView').classList.add('hidden');
-                document.getElementById('mobileTasks').classList.add('hidden');
-                document.getElementById('kanbanView').classList.add('hidden');
-                document.getElementById('analyticsView').classList.remove('hidden');
-                setTimeout(() => generateAnalytics(), 100); // Wait for DOM
-            } else if (pageTitle === 'Reports') {
-                document.getElementById('tableView').classList.add('hidden');
-                document.getElementById('mobileTasks').classList.add('hidden');
-                document.getElementById('analyticsView').classList.add('hidden');
-                document.getElementById('reportsView').classList.remove('hidden');
-            } else if (pageTitle === 'Manage Users' || pageTitle === 'Deleted Tasks') {
-                // Already handled by setPage
-            } else {
-                document.getElementById('tableView').classList.remove('hidden');
-                document.getElementById('kanbanView').classList.add('hidden');
-                document.getElementById('analyticsView').classList.add('hidden');
-                document.getElementById('reportsView').classList.add('hidden');
-                renderTable(filtered);
-                renderMobileCards(filtered);
-            }
-            
-            // Highlight search results
-            if (searchTerm) {
-                highlightSearchResults();
-            }
-        }
-        
-        function highlightSearchResults() {
-            document.querySelectorAll('#taskTable td, #mobileTasks .kanban-task').forEach(element => {
-                const html = element.innerHTML;
-                const highlighted = html.replace(
-                    new RegExp(searchTerm, 'gi'),
-                    match => `<span class="search-highlight">${match}</span>`
-                );
-                if (highlighted !== html) {
-                    element.innerHTML = highlighted;
-                }
-            });
-        }
-        
-        // Enhanced Table Render
-        function renderTable(filteredTasks) {
-            const taskTable = document.getElementById('taskTable');
-            
-            taskTable.innerHTML = filteredTasks.map(task => {
-                const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'Done';
-                
-                return `
-                <tr class="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition ${task.status === 'Pending' ? '' : 'bg-gray-50/50 dark:bg-gray-800/50'}">
-                    <td class="p-3 font-mono text-xs font-bold whitespace-nowrap dark:text-white">${task.task_id}</td>
-                    <td class="p-3 font-medium task-cell dark:text-white" style="min-width: 200px;">
-                        ${task.title}
-                        ${isOverdue ? '<span class="ml-2 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-0.5 rounded">Overdue</span>' : ''}
-                    </td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded-full text-xs ${getPriorityColor(task.priority)} whitespace-nowrap">
-                            <i class="${getPriorityIcon(task.priority)} mr-1"></i>
-                            ${task.priority}
-                        </span>
-                    </td>
-                    <td class="p-3 task-cell dark:text-white">${task.by || '--'}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded-full text-xs ${task.to === currentUser ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'} whitespace-nowrap">
-                            ${task.to}
-                        </span>
-                    </td>
-                    <td class="p-3 text-xs ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : 'text-gray-500 dark:text-gray-400'} whitespace-nowrap">
-                        ${task.due_date ? new Date(task.due_date).toLocaleDateString() : '--'}
-                    </td>
-                    <td class="p-3">
-                        <div class="space-y-1">
-                            <div class="progress-bar">
-                                <div class="progress-fill ${task.progress < 50 ? 'bg-red-500' : task.progress < 100 ? 'bg-yellow-500' : 'bg-green-500'}" 
-                                     style="width: ${task.progress}%"></div>
+            const historyContent = document.getElementById('historyContent');
+            historyContent.innerHTML = `
+                <div class="mb-4">
+                    <h4 class="font-medium dark:text-white">Task: ${task.title}</h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">ID: ${task.task_id}</p>
+                </div>
+                <div class="space-y-3">
+                    ${task.history && task.history.length > 0 ? 
+                        task.history.map(item => `
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <i class="fas fa-history text-gray-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm dark:text-white">${item}</p>
+                                </div>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 text-center">${task.progress}%</div>
-                        </div>
-                    </td>
+                        `).join('') : 
+                        '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No history available</p>'
+                    }
+                </div>
+            `;
+            
+            document.getElementById('historyModal').classList.replace('hidden', 'flex');
+        }
+        
+        function closeHistory() {
+            document.getElementById('historyModal').classList.replace('flex', 'hidden');
+        }
+        
+        async function changePassword(e) {
+            e.preventDefault();
+            // Implement password change logic here
+            alert('Password change functionality to be implemented');
+        }
+        
+        async function saveUser(e) {
+            e.preventDefault();
+            // Implement user creation logic here
+            alert('User creation functionality to be implemented');
+        }
+        
+        async function loadManageUsers() {
+            await loadUsers(true);
+            const usersTable = document.getElementById('usersTable');
+            
+            usersTable.innerHTML = users.map(user => `
+                <tr class="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="p-3 font-medium dark:text-white">${user.username}</td>
+                    <td class="p-3 dark:text-white">${user.full_name || '--'}</td>
+                    <td class="p-3 dark:text-white">${user.email || '--'}</td>
                     <td class="p-3">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
-                                   ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
-                                     task.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 
-                                     'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'} 
-                                   whitespace-nowrap">
-                            <span class="w-1.5 h-1.5 ${task.status === 'Done' ? 'bg-green-600' : 
-                                                     task.status === 'In Progress' ? 'bg-blue-600' : 
-                                                     'bg-yellow-600'} rounded-full mr-1.5"></span>
-                            ${task.status}
+                        <span class="px-2 py-1 rounded-full text-xs ${user.role === 'admin' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}">
+                            ${user.role}
                         </span>
                     </td>
                     <td class="p-3">
-                        <div class="flex gap-1 flex-wrap">
-                            <button onclick="updateProgress('${task.id}', ${Math.min(task.progress + 25, 100)})" 
-                                    class="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition" title="Add Progress">
-                                <i class="fas fa-plus text-green-600 dark:text-green-400"></i>
-                            </button>
-                            <button onclick="openEdit('${task.id}')" 
-                                    class="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition" title="Edit">
+                        <span class="px-2 py-1 rounded-full text-xs ${user.status === 'active' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'}">
+                            ${user.status || 'active'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-xs text-gray-500 dark:text-gray-400">${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td class="p-3 text-xs text-gray-500 dark:text-gray-400">${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+                    <td class="p-3">
+                        <div class="flex gap-1">
+                            <button onclick="editUser('${user.id}')" class="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition">
                                 <i class="fas fa-edit text-blue-600 dark:text-blue-400"></i>
                             </button>
-                            ${task.status !== 'Done' ? 
-                                `<button onclick="openHandover('${task.id}')" 
-                                        class="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition" title="Handover">
-                                    <i class="fas fa-exchange-alt text-purple-600 dark:text-purple-400"></i>
-                                </button>` : ''
-                            }
-                            <button onclick="viewHistory('${task.id}')" 
-                                    class="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition" title="History">
-                                <i class="fas fa-history text-yellow-600 dark:text-yellow-400"></i>
-                            </button>
-                            <button onclick="deleteTask('${task.id}')" 
-                                    class="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete">
+                            <button onclick="deleteUser('${user.id}')" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition">
                                 <i class="fas fa-trash text-red-600 dark:text-red-400"></i>
                             </button>
                         </div>
                     </td>
-                </tr>`;
-            }).join('');
-            
-            if (filteredTasks.length === 0) {
-                showEmptyState();
+                </tr>
+            `).join('');
+        }
+        
+        async function loadDeletedTasks() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('tasks')
+                    .select('*')
+                    .not('deleted_at', 'is', null)
+                    .order('deleted_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const deletedTasksTable = document.getElementById('deletedTasksTable');
+                
+                deletedTasksTable.innerHTML = data.map(task => `
+                    <tr class="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="p-3 font-mono text-xs dark:text-white">${task.task_id}</td>
+                        <td class="p-3 dark:text-white">${task.title}</td>
+                        <td class="p-3 dark:text-white">${task.assigned_by || '--'}</td>
+                        <td class="p-3 dark:text-white">${task.assigned_to}</td>
+                        <td class="p-3 text-xs text-gray-500 dark:text-gray-400">${new Date(task.deleted_at).toLocaleString()}</td>
+                        <td class="p-3">
+                            <button onclick="restoreTask('${task.id}')" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
+                                Restore
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading deleted tasks:', error);
             }
+        }
+        
+        async function restoreTask(taskId) {
+            if (!confirm('Restore this task?')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('tasks')
+                    .update({ 
+                        deleted_at: null,
+                        deleted_by: null
+                    })
+                    .eq('id', taskId);
+                
+                if (error) throw error;
+                
+                await loadDeletedTasks();
+                await loadTasks(true);
+                render();
+                
+            } catch (error) {
+                alert('Error restoring task: ' + error.message);
+            }
+        }
+        
+        async function initializeApp() {
+            // Load users and tasks
+            await loadUsers();
+            await loadTasks();
+            
+            // Update user info in UI
+            updateUserInfo();
+            
+            // Show admin menu if admin
+            if (currentUserRole === 'admin') {
+                document.getElementById('adminMenu').classList.remove('hidden');
+            }
+            
+            // Initial render
+            render();
+            
+            // Set page title
+            setPage('Dashboard');
+            
+            // Update DB status
+            document.getElementById('dbStatusText').textContent = 'Connected to database';
         }
         
         // Service Worker Registration for PWA
@@ -1649,32 +2510,37 @@
             loadDarkModePreference();
             
             // Initialize date pickers
-            flatpickr("#dueDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today"
-            });
-            
-            flatpickr("#recurringEndDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today"
-            });
-            
-            flatpickr("#filterDate", {
-                dateFormat: "Y-m-d"
-            });
+            if (typeof flatpickr !== 'undefined') {
+                flatpickr("#dueDate", {
+                    dateFormat: "Y-m-d",
+                    minDate: "today"
+                });
+                
+                flatpickr("#recurringEndDate", {
+                    dateFormat: "Y-m-d",
+                    minDate: "today"
+                });
+                
+                flatpickr("#filterDate", {
+                    dateFormat: "Y-m-d"
+                });
+            }
             
             // Check auto-login
-            const savedUser = localStorage.getItem('awch_user');
+            const savedUser = localStorage.getItem('awch_user') || sessionStorage.getItem('awch_user');
             if (savedUser) {
                 try {
                     const userData = JSON.parse(savedUser);
                     const isAutoLoggedIn = await checkAutoLogin(userData);
                     
                     if (isAutoLoggedIn) {
+                        document.getElementById('loginPage').classList.add('hidden');
+                        document.getElementById('appContainer').classList.remove('hidden');
                         await initializeApp();
                     }
                 } catch (error) {
                     localStorage.removeItem('awch_user');
+                    sessionStorage.removeItem('awch_user');
                 }
             }
             
@@ -1696,14 +2562,6 @@
             render();
             alert('Data refreshed from database');
         };
-        
-        // Note: You need to add the missing functions from your original code:
-        // - handleLogin, logout, saveTask, openEdit, closeModal, etc.
-        // - Cache helper functions (getFromCache, setToCache, clearCache)
-        // - Password hashing functions
-        // - All other existing functions from your original code
-        
-        // Add these at the end or integrate with your existing functions
     </script>
 </body>
 </html>
